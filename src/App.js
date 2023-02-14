@@ -1,25 +1,33 @@
-import logo from './logo.svg';
-import './App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import React, {useState} from "react";
+import {contextCurrentTable, contextSelectedRows, contextCurrentShift} from "./context";
+import MainTable from "./components/MainTable";
+import NavBar from "./components/NavBar";
+import CommentBlock from "./components/CommentBlock";
+import ButtonsBlock from "./components/ButtonsBlock";
+import FiltersBlock from "./components/FiltersBlock";
+
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [currentTable, setCurrentTable] = useState(1)
+    const [selectedRows, setSelectedRows] = useState([])
+    const [currentShift, setCurrentShift] = useState(null)
+
+    return (
+        <div className="App">
+            <contextCurrentTable.Provider value={[currentTable, setCurrentTable]}>
+                <contextSelectedRows.Provider value={[selectedRows, setSelectedRows]}>
+                    <contextCurrentShift.Provider value={[currentShift, setCurrentShift]}>
+                        <NavBar/>
+                        <FiltersBlock/>
+                        <MainTable/>
+                        <CommentBlock/>
+                        <ButtonsBlock/>
+                    </contextCurrentShift.Provider>
+                </contextSelectedRows.Provider>
+            </contextCurrentTable.Provider>
+        </div>
+    );
 }
 
 export default App;
