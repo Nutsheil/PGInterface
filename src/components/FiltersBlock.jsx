@@ -23,11 +23,11 @@ const FiltersBlock = () => {
         const shiftCDString = shiftCD.toString()
         const date = moment(shiftCDString.substring(0, 5), "YYWWE")
         if (shiftCDString[5] === "1") {
-            setShiftStartTime(date.format("DD-MM-YY  ").concat("8:00"))
-            setShiftEndTime(date.format("DD-MM-YY  ").concat("20:00"))
+            setShiftStartTime(date.format("DD.MM.YY  ").concat("8:00"))
+            setShiftEndTime(date.format("DD.MM.YY  ").concat("20:00"))
         } else {
-            setShiftStartTime(date.format("DD-MM-YY  ").concat("20:00"))
-            setShiftEndTime(date.add(1, 'd').format("DD-MM-YY  ").concat("8:00"))
+            setShiftStartTime(date.format("DD.MM.YY  ").concat("20:00"))
+            setShiftEndTime(date.add(1, 'd').format("DD.MM.YY  ").concat("8:00"))
         }
     }
 
@@ -57,7 +57,7 @@ const FiltersBlock = () => {
     }, [currentMachine])
 
     const optionsMachines = machines.map((machine) => (
-        {value: machine.mach_no, label: machine.description}
+        {value: machine.mach_no, label: machine.mach_no + " - " + machine.description}
     ))
     const optionsShifts = shifts.map((shift) => (
         {value: shift.shift_id, label: shift.shift_code}
