@@ -3,6 +3,7 @@ import TextareaAutosize from "react-textarea-autosize";
 import classes from "./CommentBlock.module.css";
 import {contextSelectedRows} from "../context";
 import classnames from "classnames";
+import store from "../store/Store";
 
 const CommentBlock = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
@@ -12,7 +13,11 @@ const CommentBlock = () => {
             return ""
         }
         if (selectedRows.length === 1) {
-            return "комментарий к стопу с id: " + selectedRows[0]
+            const stopTran = store.stopTrans.getStopTran(selectedRows[0])
+            if (stopTran)
+                if (stopTran.comment)
+                    return stopTran.comment.comment_text
+            return ""
         }
         return "Выбрано несколько строк"
     }

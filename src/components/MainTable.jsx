@@ -3,9 +3,9 @@ import {contextCurrentTable, contextSelectedRows, contextCurrentShift} from "../
 import classes from "./MainTable.module.css";
 import blueCircle from "../assets/blueCircle.png"
 import {getTableName} from "../dictionary";
-import {getStopTrans} from "../http/api";
 import moment from "moment";
 import {useKeyPress} from "../hooks/useKeyPress";
+import store from "../store/Store";
 
 const stopTransHeaders = ["Start", "End", "Duration", "PLC Code", "Code", "C", "Description", "PLC Desc.", "Reason", "Place", "Main", "Harm"]
 
@@ -14,17 +14,18 @@ const MainTable = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
     const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
 
-    const [data, setData] = useState([])
+    const [stopTrans, setStopTrans] = useState([])
 
     const isKeyControl = useKeyPress('Control')
 
     useEffect(() => {
-        if (currentShift)
-            getStopTrans(currentShift).then(response => {
-                setData(response)
+        if (currentShift) {
+            store.stopTrans.updateStopTrans(currentShift).then(() => {
+                setStopTrans(store.stopTrans.getStopTrans())
             }).catch(error => {
                 console.log(error)
             })
+        }
     }, [currentShift])
 
     const updateSelections = (index) => {
@@ -128,7 +129,7 @@ const MainTable = () => {
                 <div className={classes.table_responsive_body}>
                     <table className={classes.table}>
                         <tbody>
-                        {data.map((stopTran, index) => (
+                        {stopTrans.map((stopTran, index) => (
                             <tr
                                 key={stopTran.stop_id}
                                 onClick={() => updateSelections(stopTran.stop_id)}
