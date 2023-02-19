@@ -16,17 +16,34 @@ const MainTable = () => {
 
     const [stopTrans, setStopTrans] = useState([])
 
+    const [isLoaded, setIsLoaded] = useState(false)
+
     const isKeyControl = useKeyPress('Control')
 
     useEffect(() => {
         if (currentShift) {
+            setIsLoaded(() => false)
             store.stopTrans.updateStopTrans(currentShift).then(() => {
                 setStopTrans(store.stopTrans.getStopTrans())
+                setIsLoaded(() => true)
             }).catch(error => {
                 console.log(error)
             })
         }
     }, [currentShift])
+
+    useEffect(() => {
+        if (store.stopTrans.needUpdate) {
+            setIsLoaded(() => false)
+            store.stopTrans.updateStopTrans(currentShift).then(() => {
+                setStopTrans(store.stopTrans.getStopTrans())
+                store.stopTrans.needUpdate = false
+                setIsLoaded(() => true)
+            }).catch(err => {
+                console.log(err)
+            })
+        }
+    }, [store.stopTrans.needUpdate])
 
     const updateSelections = (index) => {
         if (isKeyControl) {
@@ -49,14 +66,12 @@ const MainTable = () => {
         if (stopTran.stop_beg_time === null)
             return null
 
-        const date = new Date(stopTran.stop_beg_time)
-        return moment(date).format("DD.MM.YY HH:mm:ss")
+        return moment(stopTran.stop_beg_time).format("DD.MM.YY HH:mm:ss")
     }
     const getStopEndTime = (stopTran) => {
         if (stopTran.stop_end_time === null)
             return null
 
-        const date = new Date(stopTran.stop_end_time)
         return moment(stopTran.stop_end_time).format("DD.MM.YY HH:mm:ss")
     }
     const getStopDuration = (stopTran) => {
@@ -116,43 +131,45 @@ const MainTable = () => {
     return (
         <div className={classes.container}>
             <h1 align={'center'}>{getTableName(currentTable)}</h1>
-            <div className={classes.table_responsive}>
-                <table className={classes.table}>
-                    <thead>
-                    <tr>
-                        {stopTransHeaders.map((v, index) => (
-                            <th key={index}>{v}</th>
-                        ))}
-                    </tr>
-                    </thead>
-                </table>
-                <div className={classes.table_responsive_body}>
+            {isLoaded &&
+                <div className={classes.table_responsive}>
                     <table className={classes.table}>
-                        <tbody>
-                        {stopTrans.map((stopTran, index) => (
-                            <tr
-                                key={stopTran.stop_id}
-                                onClick={() => updateSelections(stopTran.stop_id)}
-                                className={selectedRows.includes(stopTran.stop_id) ? classes.selected : classes.not_selected}
-                            >
-                                <td>{getStopStartTime(stopTran)}</td>
-                                <td>{getStopEndTime(stopTran)}</td>
-                                <td>{getStopDuration(stopTran)}</td>
-                                <td>{getStopPLCCode(stopTran)}</td>
-                                <td>{getStopCode(stopTran)}</td>
-                                <td>{getStopCommentFlag(stopTran)}</td>
-                                <td>{getStopDescription(stopTran)}</td>
-                                <td>{getStopPLCDesc(stopTran)}</td>
-                                <td>{getStopReason(stopTran)}</td>
-                                <td>{getStopPlace(stopTran)}</td>
-                                <td>{getStopMain(stopTran)}</td>
-                                <td>{getStopHarm(stopTran)}</td>
-                            </tr>
-                        ))}
-                        </tbody>
+                        <thead>
+                        <tr>
+                            {stopTransHeaders.map((v, index) => (
+                                <th key={index}>{v}</th>
+                            ))}
+                        </tr>
+                        </thead>
                     </table>
+                    <div className={classes.table_responsive_body}>
+                        <table className={classes.table}>
+                            <tbody>
+                            {stopTrans.map((stopTran, index) => (
+                                <tr
+                                    key={stopTran.stop_id}
+                                    onClick={() => updateSelections(stopTran.stop_id)}
+                                    className={selectedRows.includes(stopTran.stop_id) ? classes.selected : classes.not_selected}
+                                >
+                                    <td>{getStopStartTime(stopTran)}</td>
+                                    <td>{getStopEndTime(stopTran)}</td>
+                                    <td>{getStopDuration(stopTran)}</td>
+                                    <td>{getStopPLCCode(stopTran)}</td>
+                                    <td>{getStopCode(stopTran)}</td>
+                                    <td>{getStopCommentFlag(stopTran)}</td>
+                                    <td>{getStopDescription(stopTran)}</td>
+                                    <td>{getStopPLCDesc(stopTran)}</td>
+                                    <td>{getStopReason(stopTran)}</td>
+                                    <td>{getStopPlace(stopTran)}</td>
+                                    <td>{getStopMain(stopTran)}</td>
+                                    <td>{getStopHarm(stopTran)}</td>
+                                </tr>
+                            ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     );
 };

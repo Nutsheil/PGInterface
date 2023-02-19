@@ -1,4 +1,5 @@
 import {$host} from "./index";
+import {hover} from "@testing-library/user-event/dist/hover";
 
 export const getStopTrans = async (shift_id) => {
     const {data} = await $host.get(`/api/v1/stop-trans-full/?shift_id=${shift_id}`)
@@ -9,6 +10,12 @@ export const getStopTrans = async (shift_id) => {
 export const getStopTran = async (id) => {
     const {data} = await $host.get(`/api/v1/stop-trans-full/${id}/`)
     console.log("get StopTran id: ", id)
+    console.log(data)
+    return data
+}
+export const updateStopTran = async (id, stopTran) => {
+    const {data} = await $host.patch(`/api/v1/stop-trans/${id}/`, stopTran)
+    console.log("stopTran by id " + id + " is updated")
     console.log(data)
     return data
 }

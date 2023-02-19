@@ -14,18 +14,26 @@
 .block_datetime_start {
     display: flex;
     justify-content: space-between;
-    width: 160px;
+    width: 200px;
 }
 .block_datetime_end {
     display: flex;
     justify-content: space-between;
-    width: 160px;
+    width: 200px;
 }
 
-.block_datetime label {
-    /*margin-right: 15px;*/
+
+.buttons_block {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin: auto;
 }
 
+
+.textarea {
+    width: 100%;
+}
 
 
 

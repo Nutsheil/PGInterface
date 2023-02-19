@@ -1,58 +1,144 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import ModalWindow from "../modal/ModalWindow";
-import {getStopCodes, getStopMains, getStopPlaces, getStopReasons, getStopTran} from "../../http/api";
+import {getStopTran, updateStopTran} from "../../http/api";
 import classes from "./ModalEditStopTrans.module.css";
 import Select from "react-select";
 import TextareaAutosize from "react-textarea-autosize";
 import moment from 'moment';
 import store from "../../store/Store";
+import {contextCurrentShift} from "../../context";
 
 const ModalEditStopTrans = ({active, setActive, stopId}) => {
+    const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
+
     const [stopTran, setStopTran] = useState(null)
 
-    const [stopMains, setStopMains] = useState(store.stopMains.getStopMains())
-    const [stopPlaces, setStopPlaces] = useState(store.stopPlaces.getStopPlaces())
-    const [stopReasons, setStopReasons] = useState(store.stopReasons.getStopReasons())
-    const [stopCodes, setStopCodes] = useState(store.stopCodes.getStopCodes())
+    const [stopMains, setStopMains] = useState([])
+    const [stopPlaces, setStopPlaces] = useState([])
+    const [stopReasons, setStopReasons] = useState([])
+    const [stopCodes, setStopCodes] = useState([])
 
-    const [stopDateStart, setStopDateStart] = useState()
-    const [stopTimeStart, setStopTimeStart] = useState()
-    const [stopDateEnd, setStopDateEnd] = useState()
-    const [stopTimeEnd, setStopTimeEnd] = useState()
+    const [stopStart, setStopStart] = useState(null)
+    const [stopEnd, setStopEnd] = useState(null)
     const [currentStopMain, setCurrentStopMain] = useState(null)
     const [currentStopPlace, setCurrentStopPlace] = useState(null)
     const [currentStopReason, setCurrentStopReason] = useState(null)
     const [currentStopCode, setCurrentStopCode] = useState(null)
+    const [currentComment, setCurrentComment] = useState("")
+
+    ///TODO: replace this by object from store without server request (may be)
+    const fillStopTranInfo = () => {
+        getStopTran(stopId).then(response => {
+            setStopTran(response[0])
+            console.log("StopTran in edit: ", response[0])
+
+            if (response[0].stop_beg_time)
+                setStopStart(moment(response[0].stop_beg_time).format("DD.MM.YY HH:mm:ss"))
+            if (response[0].stop_end_time)
+                setStopEnd(moment(response[0].stop_end_time).format("DD.MM.YY HH:mm:ss"))
+
+            if (response[0].comment)
+                setCurrentComment(response[0].comment.comment_text)
+            else
+                setCurrentComment("")
+
+            if (response[0].stop_cd) {
+                setCurrentStopCode(response[0].stop_cd.stop_cd)
+
+                if (response[0].stop_cd.stop_place) {
+                    setCurrentStopPlace(response[0].stop_cd.stop_place.stop_place)
+                    if (response[0].stop_cd.stop_place.stop_main)
+                        setCurrentStopMain(response[0].stop_cd.stop_place.stop_main.stop_main)
+                }
+
+                if (response[0].stop_cd.stop_reason)
+                    setCurrentStopReason(response[0].stop_cd.stop_reason.stop_reason)
+            }
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    const clearCurrentData = () => {
+        setCurrentStopMain(() => null)
+        setCurrentStopPlace(() => null)
+        setCurrentStopReason(() => null)
+        setCurrentStopCode(() => null)
+        setCurrentComment(() => "")
+    }
+
+    const getDataFromStore = () => {
+        setStopMains(store.stopMains.getStopMainsMachine())
+        setStopPlaces(store.stopPlaces.getStopPlacesMachine())
+        setStopReasons(store.stopReasons.getStopReasonsMachine())
+        setStopCodes(store.stopCodes.getStopCodesMachine())
+    }
 
     useEffect(() => {
-        if (active)
-            getStopTran(stopId).then(response => {
-                setStopTran(response[0])
-                console.log(response[0])
-
-                if (response[0].stop_cd) {
-                    if (response[0].stop_cd.stop_place) {
-                        setCurrentStopPlace(response[0].stop_cd.stop_place.stop_place)
-                        if (response[0].stop_cd.stop_place.stop_main)
-                            setCurrentStopMain(response[0].stop_cd.stop_place.stop_main.stop_main)
-                    }
-
-                    if (response[0].stop_cd.stop_reason)
-                        setCurrentStopReason(response[0].stop_cd.stop_reason.stop_reason)
-
-                    setCurrentStopCode(response[0].stop_cd.stop_cd)
-                }
-            }).catch(error => {
-                console.log(error)
-            })
+        if (active) {
+            clearCurrentData()
+            fillStopTranInfo()
+            getDataFromStore()
+        }
     }, [active])
 
     useEffect(() => {
-        setStopPlaces(store.stopPlaces.getStopPlaces().filter(stopPlace => stopPlace.stop_main === currentStopMain))
+        const tmpStopPlaces = store.stopPlaces.getStopPlacesMachine().filter(stopPlace => stopPlace.stop_main === currentStopMain)
+        setStopPlaces(tmpStopPlaces)
+
+        if (!tmpStopPlaces.find(stopPlace => stopPlace.stop_place === currentStopPlace)) {
+            if (tmpStopPlaces.length)
+                setCurrentStopPlace(tmpStopPlaces[0].stop_place)
+            else
+                setCurrentStopPlace(null)
+        }
     }, [currentStopMain])
-    // useEffect(() => {
-    //     setStopReasons(store.stopReasons.getStopReasons().filter(stopReason => stopReason))
-    // })
+
+    useEffect(() => {
+        const tmpStopCodes = store.stopCodes.getStopCodesMachine().filter(stopCode => stopCode.stop_place === currentStopPlace)
+        setStopCodes(tmpStopCodes)
+
+        const stopReasonsCodes = []
+        tmpStopCodes.forEach(stopCode => {
+            if (!stopReasonsCodes.includes(stopCode.stop_reason))
+                stopReasonsCodes.push(stopCode.stop_reason)
+        })
+        const tmpStopReasons = store.stopReasons.getStopReasonsMachine().filter(stopReason => stopReasonsCodes.includes(stopReason.stop_reason))
+        setStopReasons(tmpStopReasons)
+
+        if (!tmpStopCodes.find(stopCode => stopCode.stop_cd === currentStopCode)) {
+            if (tmpStopCodes.length)
+                setCurrentStopCode(tmpStopCodes[0].stop_cd)
+            else
+                setCurrentStopCode(null)
+        }
+
+        if (!tmpStopReasons.find(stopReason => stopReason.stop_reason === currentStopReason)) {
+            if (tmpStopReasons.length)
+                setCurrentStopReason(tmpStopReasons[0].stop_reason)
+            else
+                setCurrentStopReason(null)
+        }
+    }, [currentStopPlace])
+
+    const updateReport = () => {
+        updateStopTran(stopTran.stop_id, {
+            stop_cd: currentStopCode
+        }).then(response => {
+            console.log(response)
+
+            setActive(false)
+            store.stopTrans.needUpdate = true
+            // store.stopTrans.updateStopTrans(currentShift).then(() => {
+            //     setActive(false)
+            // }).catch(err => {
+            //     console.log(err)
+            // })
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
 
     const optionsStopMain = stopMains.map((stopMain) => (
         {value: stopMain.stop_main, label: stopMain.description}
@@ -85,26 +171,40 @@ const ModalEditStopTrans = ({active, setActive, stopId}) => {
             return
 
         setCurrentStopMain(newValue.value)
-        // setStopPlaces(store.stopPlaces.getStopPlaces().filter(stopPlace => stopPlace.stop_main === newValue.value))
-        // console.log(store.stopPlaces.getStopPlaces().filter(stopPlace => stopPlace.stop_main === newValue.value))
+    }
+    const onChangeStopPlace = (newValue) => {
+        if (newValue.value === currentStopPlace)
+            return
+
+        setCurrentStopPlace(newValue.value)
+    }
+    const onChangeStopReason = (newValue) => {
+        if (newValue.value === currentStopReason)
+            return
+
+        setCurrentStopReason(newValue.value)
+    }
+    const onChangeStopCode = (newValue) => {
+        if (newValue.value === currentStopCode)
+            return
+
+        setCurrentStopCode(newValue.value)
     }
 
     return (
         <ModalWindow active={active} setActive={setActive}>
             <h5 align={"center"}>
-                Редактирование отчета с id {stopId}
+                Редактирование стопа с id {stopId}
             </h5>
 
             <div className={classes.block_datetime}>
                 <div className={classes.block_datetime_start}>
                     <label>Начало </label>
-                    <button>test</button>
-                    <button>test</button>
+                    <label>{stopStart}</label>
                 </div>
                 <div className={classes.block_datetime_end}>
                     <label>Конец </label>
-                    <button>test</button>
-                    <button>test</button>
+                    <label>{stopEnd}</label>
                 </div>
             </div>
 
@@ -126,6 +226,7 @@ const ModalEditStopTrans = ({active, setActive, stopId}) => {
                         <Select
                             options={optionsStopPlace}
                             value={getValueStopPlace()}
+                            onChange={onChangeStopPlace}
                         />
                     </td>
                 </tr>
@@ -135,6 +236,7 @@ const ModalEditStopTrans = ({active, setActive, stopId}) => {
                         <Select
                             options={optionsStopReason}
                             value={getValueStopReason()}
+                            onChange={onChangeStopReason}
                         />
                     </td>
                 </tr>
@@ -144,6 +246,7 @@ const ModalEditStopTrans = ({active, setActive, stopId}) => {
                         <Select
                             options={optionsStopCode}
                             value={getValueStopCode()}
+                            onChange={onChangeStopCode}
                         />
                     </td>
                 </tr>
@@ -151,14 +254,20 @@ const ModalEditStopTrans = ({active, setActive, stopId}) => {
                     <th>Comment</th>
                     <td>
                         <TextareaAutosize
+                            className={classes.textarea}
+                            value={currentComment}
+                            onChange={(event) => setCurrentComment(event.target.value)}
                         />
                     </td>
                 </tr>
                 </tbody>
             </table>
 
-            <button className={classes.button_back}>Назад</button>
-            <button className={classes.button_create}>Сохранить</button>
+            <div className={classes.buttons_block}>
+                <button onClick={() => setActive(false)}>Отмена</button>
+                <button onClick={updateReport}>Сохранить</button>
+            </div>
+
         </ModalWindow>
     );
 };

@@ -5,6 +5,7 @@ import {getMachines, getShiftCodes} from "../http/api";
 import {contextCurrentShift, contextSelectedRows} from "../context";
 import moment from "moment";
 import ModalSearchShift from "./modals/ModalSearchShift";
+import store from "../store/Store";
 
 const FiltersBlock = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
@@ -44,7 +45,11 @@ const FiltersBlock = () => {
     useEffect(() => {
         setShifts(() => [])
         setCurrentShift(() => null)
-        if (currentMachine)
+        setSelectedRows(() => [])
+        store.machine = currentMachine
+        if (currentMachine) {
+            store.filterStore(currentMachine)
+
             getShiftCodes(currentMachine).then(response => {
                 setShifts(() => response)
                 if (response.length) {
@@ -54,6 +59,7 @@ const FiltersBlock = () => {
             }).catch(error => {
                 console.log(error)
             })
+        }
     }, [currentMachine])
 
     const optionsMachines = machines.map((machine) => (

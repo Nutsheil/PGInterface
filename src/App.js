@@ -15,10 +15,11 @@ function App() {
     const [currentShift, setCurrentShift] = useState(null)
 
     useEffect(() => {
-        const promises = store.update
+        const promises = store.update()
         Promise.all(promises).then(() => {
-            console.log("update store success")
+            console.log("store was loaded success")
         }).catch(error => {
+            console.log("error in loading store")
             console.log(error)
         })
     }, [])

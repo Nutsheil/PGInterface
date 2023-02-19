@@ -24,15 +24,7 @@ class StopTransStore {
         })
     }
 
-    getNewStopTrans(shift_id) {
-        getStopTrans(shift_id).then(response => {
-            this.#setStopTrans(response)
-            return response
-        }).catch(error => {
-            console.log(error)
-        })
-        return []
-    }
+    needUpdate: false
 }
 
 export default new StopTransStore()
