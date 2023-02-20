@@ -141,16 +141,16 @@ const ModalEditStopTrans = ({active, setActive, stopId}) => {
 
 
     const optionsStopMain = stopMains.map((stopMain) => (
-        {value: stopMain.stop_main, label: stopMain.description}
+        {value: stopMain.stop_main, label: stopMain.stop_main + " - " + stopMain.description}
     ))
     const optionsStopPlace = stopPlaces.map((stopPlace) => (
-        {value: stopPlace.stop_place, label: stopPlace.description}
+        {value: stopPlace.stop_place, label: stopPlace.stop_place + " - " + stopPlace.description}
     ))
     const optionsStopReason = stopReasons.map((StopReason) => (
-        {value: StopReason.stop_reason, label: StopReason.description}
+        {value: StopReason.stop_reason, label: StopReason.stop_reason + " - " + StopReason.description}
     ))
     const optionsStopCode = stopCodes.map((stopCode) => (
-        {value: stopCode.stop_cd, label: stopCode.description}
+        {value: stopCode.stop_cd, label: stopCode.stop_cd + " - " + stopCode.description}
     ))
 
     const getValueStopMain = () => {
