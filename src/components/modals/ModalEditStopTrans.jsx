@@ -257,6 +257,7 @@ const ModalEditStopTrans = ({active, setActive, stopId}) => {
                             className={classes.textarea}
                             value={currentComment}
                             onChange={(event) => setCurrentComment(event.target.value)}
+                            maxRows={5}
                         />
                     </td>
                 </tr>
