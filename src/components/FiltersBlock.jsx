@@ -10,6 +10,7 @@ import store from "../store/Store";
 const FiltersBlock = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
     const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
+
     const [currentMachine, setCurrentMachine] = useState(null)
 
     const [machines, setMachines] = useState([])

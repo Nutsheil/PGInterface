@@ -1,5 +1,4 @@
 import {$host} from "./index";
-import {hover} from "@testing-library/user-event/dist/hover";
 
 export const getStopTrans = async (shift_id) => {
     const {data} = await $host.get(`/api/v1/stop-trans-full/?shift_id=${shift_id}`)
@@ -16,6 +15,39 @@ export const getStopTran = async (id) => {
 export const updateStopTran = async (id, stopTran) => {
     const {data} = await $host.patch(`/api/v1/stop-trans/${id}/`, stopTran)
     console.log("stopTran by id " + id + " is updated")
+    console.log(data)
+    return data
+}
+export const createStopTran = async (stopTran) => {
+    const {data} = await $host.post(`/api/v1/stop-trans/`, stopTran)
+    console.log("stopTran created")
+    console.log(data)
+    return data
+}
+
+
+export const getComments = async () => {
+    const {data} = await $host.get(`/api/v1/stop-comment/`)
+    console.log("get all comments")
+    console.log(data)
+    return data
+}
+export const getComment = async (id) => {
+    const {data} = await $host.get(`/api/v1/stop-comment/${id}/`)
+    console.log("get comment id: ", id)
+    console.log(data)
+    return data
+}
+export const updateComment = async (id, comment) => {
+    console.log(comment)
+    const {data} = await $host.patch(`/api/v1/stop-comment/${id}/`, comment)
+    console.log("comment by id " + id + " is updated")
+    console.log(data)
+    return data
+}
+export const createComment = async (comment) => {
+    const {data} = await $host.post(`/api/v1/stop-comment/`, comment)
+    console.log("comment created")
     console.log(data)
     return data
 }

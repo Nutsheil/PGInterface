@@ -2,33 +2,53 @@ import React, {useContext, useState} from 'react';
 import classes from "./ButtonsBlock.module.css";
 import {Button} from "react-bootstrap";
 import {contextSelectedRows} from "../context";
-import ModalEditStopTrans from "./modals/ModalEditStopTrans";
+import ModalStopTrans from "./modals/ModalStopTrans";
+import {STOP_TRANS_ADD_FLAG, STOP_TRANS_EDIT_FLAG, STOP_TRANS_SPLIT_FLAG} from "../utils/consts";
 
 const ButtonsBlock = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
 
-    const [modalEditStopTransActive, setModalEditStopTransActive] = useState(false)
+    const [modalStopTransActive, setModalStopTransActive] = useState(false)
+    const [currentFlag, setCurrentFlag] = useState(0)
 
     return (
         <div className={classes.container}>
             <button
                 className={classes.button}
                 disabled={selectedRows.length !== 1}
-                onClick={() => setModalEditStopTransActive(true)}
-            >Изменить</button>
+                onClick={() => {
+                    setCurrentFlag(STOP_TRANS_EDIT_FLAG)
+                    setModalStopTransActive(true)
+                }}
+            >Изменить
+            </button>
 
-            <button className={classes.button} disabled={selectedRows.length !== 1}>Разделить</button>
+            <button
+                className={classes.button}
+                disabled={selectedRows.length !== 1}
+                onClick={() => {
+                    setCurrentFlag(STOP_TRANS_SPLIT_FLAG)
+                    setModalStopTransActive(true)
+                }}
+            >Разделить
+            </button>
+
+            <button
+                className={classes.button}
+                onClick={() => {
+                    setCurrentFlag(STOP_TRANS_ADD_FLAG)
+                    setModalStopTransActive(true)
+                }}
+            >Добавить простой
+            </button>
+
             <button className={classes.button} disabled={selectedRows.length !== 1}>Удалить простой</button>
-            <button className={classes.button} disabled={selectedRows.length < 2}>Объединить</button>
-            <button className={classes.button}>Добавить простой</button>
             <button className={classes.button}>Показать удаленные простои</button>
-            <button className={classes.button}>Добавить запись в журнал</button>
 
-
-            <ModalEditStopTrans
-                active={modalEditStopTransActive}
-                setActive={setModalEditStopTransActive}
-                stopId={selectedRows[0]}
+            <ModalStopTrans
+                active={modalStopTransActive}
+                setActive={setModalStopTransActive}
+                flag={currentFlag}
             />
         </div>
     );

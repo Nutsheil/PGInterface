@@ -11,15 +11,11 @@
     display: flex;
     justify-content: space-around;
 }
-.block_datetime_start {
+.block_datetime_item {
     display: flex;
     justify-content: space-between;
-    width: 200px;
-}
-.block_datetime_end {
-    display: flex;
-    justify-content: space-between;
-    width: 200px;
+    width: 220px;
+    font-size: 14px;
 }
 
 
