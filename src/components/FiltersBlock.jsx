@@ -63,6 +63,10 @@ const FiltersBlock = () => {
         }
     }, [currentMachine])
 
+    useEffect(() => {
+        //TODO: make this point
+    }, [currentShift])
+
     const optionsMachines = machines.map((machine) => (
         {value: machine.mach_no, label: machine.mach_no + " - " + machine.description}
     ))

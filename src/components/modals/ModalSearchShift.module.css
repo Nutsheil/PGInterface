@@ -1,4 +1,28 @@
-.datepicker {
-    width: 240px;
-    font-size: 16px;
+/*.datepicker {*/
+/*    width: 240px;*/
+/*    font-size: 16px;*/
+/*}*/
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.radio_block {
+    display: flex;
+    flex-direction: column;
+    /*margin-left: 20px;*/
+}
+
+.label_shift {
+    /*margin-left: 30px;*/
+    font-size: 18px;
+}
+
+.buttons_block {
+    display: flex;
+    justify-content: space-between;
+    width: 80%;
+    margin: 20px auto 0;
 }

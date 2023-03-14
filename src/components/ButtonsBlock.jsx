@@ -3,7 +3,12 @@ import classes from "./ButtonsBlock.module.css";
 import {Button} from "react-bootstrap";
 import {contextSelectedRows} from "../context";
 import ModalStopTrans from "./modals/ModalStopTrans";
-import {STOP_TRANS_ADD_FLAG, STOP_TRANS_EDIT_FLAG, STOP_TRANS_SPLIT_FLAG} from "../utils/consts";
+import {
+    STOP_TRANS_ADD_FLAG,
+    STOP_TRANS_DELETE_FLAG,
+    STOP_TRANS_EDIT_FLAG,
+    STOP_TRANS_SPLIT_FLAG
+} from "../utils/consts";
 
 const ButtonsBlock = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
@@ -20,7 +25,8 @@ const ButtonsBlock = () => {
                     setCurrentFlag(STOP_TRANS_EDIT_FLAG)
                     setModalStopTransActive(true)
                 }}
-            >Изменить
+            >
+                Изменить
             </button>
 
             <button
@@ -30,7 +36,8 @@ const ButtonsBlock = () => {
                     setCurrentFlag(STOP_TRANS_SPLIT_FLAG)
                     setModalStopTransActive(true)
                 }}
-            >Разделить
+            >
+                Разделить
             </button>
 
             <button
@@ -39,10 +46,22 @@ const ButtonsBlock = () => {
                     setCurrentFlag(STOP_TRANS_ADD_FLAG)
                     setModalStopTransActive(true)
                 }}
-            >Добавить простой
+                disabled={true}
+            >
+                Добавить простой
             </button>
 
-            <button className={classes.button} disabled={selectedRows.length !== 1}>Удалить простой</button>
+            <button
+                className={classes.button}
+                disabled={selectedRows.length !== 1}
+                onClick={() => {
+                    setCurrentFlag(STOP_TRANS_DELETE_FLAG)
+                    setModalStopTransActive(true)
+                }}
+            >
+                Удалить простой
+            </button>
+
             <button className={classes.button}>Показать удаленные простои</button>
 
             <ModalStopTrans

@@ -1,13 +1,25 @@
 import React, {useContext, useEffect, useState} from 'react';
 import ModalWindow from "../modal/ModalWindow";
-import {createComment, createStopTran, getStopTran, updateComment, updateStopTran} from "../../http/api";
-import classes from "./ModalEditStopTrans.module.css";
+import {
+    createComment,
+    createStopTran,
+    deleteStopTran,
+    getStopTran,
+    updateComment,
+    updateStopTran
+} from "../../http/api";
+import classes from "./ModalStopTrans.module.css";
 import Select from "react-select";
 import TextareaAutosize from "react-textarea-autosize";
 import moment from 'moment';
 import store from "../../store/Store";
 import {contextSelectedRows} from "../../context";
-import {STOP_TRANS_ADD_FLAG, STOP_TRANS_EDIT_FLAG, STOP_TRANS_SPLIT_FLAG} from "../../utils/consts";
+import {
+    STOP_TRANS_ADD_FLAG,
+    STOP_TRANS_DELETE_FLAG,
+    STOP_TRANS_EDIT_FLAG,
+    STOP_TRANS_SPLIT_FLAG
+} from "../../utils/consts";
 import {DatePicker} from "@skbkontur/react-ui";
 import TimePicker from 'react-time-picker';
 
@@ -30,6 +42,8 @@ const ModalStopTrans = ({active, setActive, flag}) => {
     const [currentStopCode, setCurrentStopCode] = useState(null)
     const [currentComment, setCurrentComment] = useState("")
 
+    const [currentDeleteComment, setCurrentDeleteComment] = useState("")
+
     const [currentStopStartDate, setCurrentStopStartDate] = useState(null)
     const [currentStopEndDate, setCurrentStopEndDate] = useState(null)
     const [currentStopStartTime, setCurrentStopStartTime] = useState(null)
@@ -46,11 +60,11 @@ const ModalStopTrans = ({active, setActive, flag}) => {
             console.log("StopTran in edit: ", response[0])
 
             if (response[0].stop_beg_time) {
-                setCurrentStopStartDate(moment(response[0].stop_beg_time).format("DD.MM.YY"))
+                setCurrentStopStartDate(moment(response[0].stop_beg_time).format("DD.MM.YYYY"))
                 setCurrentStopStartTime(moment(response[0].stop_beg_time).format("HH:mm:ss"))
             }
             if (response[0].stop_end_time) {
-                setCurrentStopEndDate(moment(response[0].stop_end_time).format("DD.MM.YY"))
+                setCurrentStopEndDate(moment(response[0].stop_end_time).format("DD.MM.YYYY"))
                 setCurrentStopEndTime(moment(response[0].stop_end_time).format("HH:mm:ss"))
             }
 
@@ -85,10 +99,14 @@ const ModalStopTrans = ({active, setActive, flag}) => {
         setCurrentStopReason(() => null)
         setCurrentStopCode(() => null)
         setCurrentComment(() => "")
-        setCurrentStopStartDate(null)
-        setCurrentStopEndDate(null)
-        setCurrentStopStartTime(null)
-        setCurrentStopEndTime(null)
+
+        setCurrentDeleteComment(() => "")
+
+        setCurrentStopStartDate(() => null)
+        setCurrentStopEndDate(() => null)
+        setCurrentStopStartTime(() => null)
+        setCurrentStopEndTime(() => null)
+
         commentId = null
         plcCode = "0000"
     }
@@ -112,6 +130,11 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                     fillStopTranInfo()
                     break
                 case STOP_TRANS_ADD_FLAG:
+                    break
+                case STOP_TRANS_DELETE_FLAG:
+                    fillStopTranInfo()
+                    break
+                default:
                     break
             }
         }
@@ -158,8 +181,12 @@ const ModalStopTrans = ({active, setActive, flag}) => {
     }, [currentStopPlace])
 
 
-    const getFullDateTime = (date, time) => {
+    const getFullDateTime = (dateString, timeString) => {
+        if (dateString === "" || timeString === null)
+            return null
 
+        const fullString = dateString + " " + timeString
+        return moment(fullString, "DD.MM.YYYY HH:mm:ss")
     }
 
 
@@ -218,6 +245,35 @@ const ModalStopTrans = ({active, setActive, flag}) => {
             console.log(error)
         })
     }
+    const splitReport = (stopStart, stopEnd) => {
+        const p1 = updateStopTran(stopTran.stop_id, {
+            stop_end_time: stopStart.format("YYYY-MM-DDTHH:mm:ss")
+        }).then(response => {
+            console.log(response)
+        }).catch(error => {
+            console.log(error)
+        })
+
+        const p2 = createStopTran({
+            stop_beg_time: stopStart.format("YYYY-MM-DDTHH:mm:ss"),
+            stop_end_time: stopEnd.format("YYYY-MM-DDTHH:mm:ss"),
+            mach_no: store.machine,
+            plc_stop_cd: plcCode,
+            stop_cd: currentStopCode,
+            comment: commentId
+        }).then(response => {
+            console.log(response)
+        }).catch(error => {
+            console.log(error)
+        })
+
+        Promise.all([p1, p2]).then(() => {
+            setActive(false)
+            store.stopTrans.needUpdate = true
+        }).catch((error) => {
+            console.log(error)
+        })
+    }
 
 
     const flagUpdate = () => {
@@ -233,19 +289,15 @@ const ModalStopTrans = ({active, setActive, flag}) => {
     }
 
     const flagCreate = () => {
-        //StopStart and StopEnd needed
-        //Comment needed
-        if (currentStopMain === null ||
-            currentStopPlace === null ||
-            currentStopReason === null ||
-            currentStopCode === null)
+        const stopStart = getFullDateTime(currentStopStartDate, currentStopStartTime)
+        const stopEnd = getFullDateTime(currentStopEndDate, currentStopEndTime)
+        if (stopStart === null || stopEnd === null || stopStart > stopEnd)
             return
 
-        const testDate = moment().format("YYYY-MM-DDTHH:mm:ss")
         Promise.all(checkForComment()).then(() => {
             const report = {
-                stop_beg_time: testDate.toString(),
-                stop_end_time: testDate.toString(),
+                stop_beg_time: stopStart.format("YYYY-MM-DDTHH:mm:ss"),
+                stop_end_time: stopEnd.format("YYYY-MM-DDTHH:mm:ss"),
                 mach_no: store.machine,
                 plc_stop_cd: plcCode,
                 stop_cd: currentStopCode,
@@ -258,11 +310,35 @@ const ModalStopTrans = ({active, setActive, flag}) => {
     }
 
     const flagSplit = () => {
-        console.log(currentStopStartDate)
-        console.log(currentStopStartTime)
+        const stopStart = getFullDateTime(currentStopStartDate, currentStopStartTime)
+        const stopEnd = getFullDateTime(currentStopEndDate, currentStopEndTime)
+        if (stopStart === null || stopEnd === null || stopStart > stopEnd)
+            return
+
+        Promise.all(checkForComment()).then(() => {
+            splitReport(stopStart, stopEnd)
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    const flagDelete = () => {
+        deleteStopTran(stopTran.stop_id).then(() => {
+            setActive(false)
+            store.stopTrans.needUpdate = true
+        }).catch(error => {
+            console.log(error)
+        })
     }
 
     const buttonApply = () => {
+        //Comment needed
+        if (currentStopMain === null ||
+            currentStopPlace === null ||
+            currentStopReason === null ||
+            currentStopCode === null)
+            return
+
         switch (flag) {
             case STOP_TRANS_EDIT_FLAG:
                 flagUpdate()
@@ -272,6 +348,9 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                 break
             case STOP_TRANS_ADD_FLAG:
                 flagCreate()
+                break
+            case STOP_TRANS_DELETE_FLAG:
+                flagDelete()
                 break
             default:
                 break
@@ -286,6 +365,22 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                 return "Разделение стопа"
             case STOP_TRANS_ADD_FLAG:
                 return "Создание нового стопа"
+            case STOP_TRANS_DELETE_FLAG:
+                return "Удаление стопа"
+            default:
+                return "UNKNOWN"
+        }
+    }
+    const getButtonApplyText = () => {
+        switch (flag) {
+            case STOP_TRANS_EDIT_FLAG:
+                return "Сохранить"
+            case STOP_TRANS_SPLIT_FLAG:
+                return "Разделить"
+            case STOP_TRANS_ADD_FLAG:
+                return "Создать"
+            case STOP_TRANS_DELETE_FLAG:
+                return "Удалить"
             default:
                 return "UNKNOWN"
         }
@@ -299,6 +394,8 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                 return false
             case STOP_TRANS_ADD_FLAG:
                 return false
+            case STOP_TRANS_DELETE_FLAG:
+                return true
             default:
                 return true
         }
@@ -311,6 +408,8 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                 return true
             case STOP_TRANS_ADD_FLAG:
                 return false
+            case STOP_TRANS_DELETE_FLAG:
+                return true
             default:
                 return true
         }
@@ -380,6 +479,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                         value={currentStopStartDate}
                         onValueChange={(v) => setCurrentStopStartDate(v)}
                         disabled={isDisableStopStart()}
+                        width={"120px"}
                     />
                     <TimePicker
                         value={currentStopStartTime}
@@ -389,7 +489,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                         disableClock={true}
                         format={"HH:mm:ss"}
                         disabled={isDisableStopStart()}
-                        onFocus={false}
+                        maxDetail={"second"}
                     />
                 </div>
                 <div className={classes.block_datetime_item}>
@@ -397,6 +497,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                         value={currentStopEndDate}
                         onValueChange={(v) => setCurrentStopEndDate(v)}
                         disabled={isDisableStopEnd()}
+                        width={"120px"}
                     />
                     <TimePicker
                         value={currentStopEndTime}
@@ -406,7 +507,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                         disableClock={true}
                         format={"HH:mm:ss"}
                         disabled={isDisableStopEnd()}
-                        onFocus={false}
+                        maxDetail={"second"}
                     />
                 </div>
             </div>
@@ -420,6 +521,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                             options={optionsStopMain}
                             value={getValueStopMain()}
                             onChange={onChangeStopMain}
+                            isDisabled={flag === STOP_TRANS_DELETE_FLAG}
                         />
                     </td>
                 </tr>
@@ -430,6 +532,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                             options={optionsStopPlace}
                             value={getValueStopPlace()}
                             onChange={onChangeStopPlace}
+                            isDisabled={flag === STOP_TRANS_DELETE_FLAG}
                         />
                     </td>
                 </tr>
@@ -440,6 +543,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                             options={optionsStopReason}
                             value={getValueStopReason()}
                             onChange={onChangeStopReason}
+                            isDisabled={flag === STOP_TRANS_DELETE_FLAG}
                         />
                     </td>
                 </tr>
@@ -450,6 +554,7 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                             options={optionsStopCode}
                             value={getValueStopCode()}
                             onChange={onChangeStopCode}
+                            isDisabled={flag === STOP_TRANS_DELETE_FLAG}
                         />
                     </td>
                 </tr>
@@ -461,15 +566,34 @@ const ModalStopTrans = ({active, setActive, flag}) => {
                             value={currentComment}
                             onChange={(event) => setCurrentComment(event.target.value)}
                             maxRows={5}
+                            disabled={flag === STOP_TRANS_DELETE_FLAG}
                         />
                     </td>
                 </tr>
                 </tbody>
             </table>
 
+            {flag === STOP_TRANS_DELETE_FLAG &&
+                <table className={classes.table}>
+                    <tbody>
+                    <tr>
+                        <th>Comment delete</th>
+                        <td>
+                            <TextareaAutosize
+                                className={classes.textarea}
+                                value={currentDeleteComment}
+                                onChange={(event) => setCurrentDeleteComment(event.target.value)}
+                                maxRows={5}
+                            />
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            }
+
             <div className={classes.buttons_block}>
                 <button onClick={() => setActive(false)}>Отмена</button>
-                <button onClick={buttonApply}>Сохранить</button>
+                <button onClick={buttonApply}>{getButtonApplyText()}</button>
             </div>
 
         </ModalWindow>

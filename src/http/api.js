@@ -24,6 +24,12 @@ export const createStopTran = async (stopTran) => {
     console.log(data)
     return data
 }
+export const deleteStopTran = async (id) => {
+    const {data} = await $host.delete(`/api/v1/stop-trans-full/${id}/`)
+    console.log("delete StopTran id: ", id)
+    console.log(data)
+    return data
+}
 
 
 export const getComments = async () => {
@@ -70,6 +76,12 @@ export const getMachine = async (id) => {
 export const getShiftCodes = async (mach_no, count=50) => {
     const {data} = await $host.get(`/api/v1/shift-codes/${mach_no}/${count}/`)
     console.log("get last ", count, " shift codes on machine ", mach_no)
+    console.log(data)
+    return data
+}
+export const getShiftCodesByDate = async (mach_no, beg_time, end_time, count=50) => {
+    const {data} = await $host.get(`/api/v1/shift-codes/${mach_no}/${count}/?beg_time=${beg_time}&end_time=${end_time}`)
+    console.log("get last shift codes on machine ", mach_no, " beg_time = ", beg_time, " end_time = ", end_time)
     console.log(data)
     return data
 }
