@@ -6,7 +6,7 @@ import classnames from "classnames";
 import store from "../store/Store";
 
 const CommentBlock = () => {
-    const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
+    const [selectedRows] = useContext(contextSelectedRows)
 
     const getComment = () => {
         if (selectedRows.length === 0) {

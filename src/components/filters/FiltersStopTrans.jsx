@@ -1,13 +1,13 @@
 import React, {useContext, useEffect, useState} from 'react';
-import classes from "./FiltersBlock.module.css";
+import classes from "./FiltersStopTrans.module.css";
 import Select from "react-select";
-import {getMachines, getShiftCodes} from "../http/api";
-import {contextCurrentShift, contextSelectedRows} from "../context";
+import {getMachines, getShiftCodes} from "../../http/api";
+import {contextCurrentShift, contextSelectedRows} from "../../context";
 import moment from "moment";
-import ModalSearchShift from "./modals/ModalSearchShift";
-import store from "../store/Store";
+import ModalSearchShift from "../modals/ModalSearchShift";
+import store from "../../store/Store";
 
-const FiltersBlock = () => {
+const FiltersStopTrans = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
     const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
 
@@ -144,4 +144,4 @@ const FiltersBlock = () => {
     );
 };
 
-export default FiltersBlock;
+export default FiltersStopTrans;

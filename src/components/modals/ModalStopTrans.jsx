@@ -2,11 +2,11 @@ import React, {useContext, useEffect, useState} from 'react';
 import ModalWindow from "../modal/ModalWindow";
 import {
     createComment,
-    createStopTran,
-    deleteStopTran,
-    getStopTran,
     updateComment,
-    updateStopTran
+    createStopTran,
+    updateStopTran,
+    deleteStopTran,
+    getStopTran
 } from "../../http/api";
 import classes from "./ModalStopTrans.module.css";
 import Select from "react-select";

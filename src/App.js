@@ -1,12 +1,12 @@
 import 'bootstrap/dist/css/bootstrap.min.css';
 import React, {useEffect, useState} from "react";
 import {contextCurrentTable, contextSelectedRows, contextCurrentShift} from "./context";
-import MainTable from "./components/MainTable";
-import NavBar from "./components/NavBar";
-import CommentBlock from "./components/CommentBlock";
-import ButtonsBlock from "./components/ButtonsBlock";
-import FiltersBlock from "./components/FiltersBlock";
 import store from "./store/Store";
+import NavBar from "./components/navbar/NavBar";
+import CommentBlock from "./components/CommentBlock";
+import FiltersBlock from "./components/filters/FiltersBlock";
+import Tables from "./components/tables/Tables";
+import ButtonsBlock from "./components/buttons_block/ButtonsBlock";
 
 
 function App() {
@@ -26,16 +26,18 @@ function App() {
 
     return (
         <div className="App">
-            <contextCurrentTable.Provider value={[currentTable, setCurrentTable]}>
+            <contextCurrentTable.Provider value={{currentTable, setCurrentTable}}>
+                <NavBar/>
+
                 <contextSelectedRows.Provider value={[selectedRows, setSelectedRows]}>
                     <contextCurrentShift.Provider value={[currentShift, setCurrentShift]}>
-                        <NavBar/>
                         <FiltersBlock/>
-                        <MainTable/>
+                        <Tables/>
                         <CommentBlock/>
                         <ButtonsBlock/>
                     </contextCurrentShift.Provider>
                 </contextSelectedRows.Provider>
+
             </contextCurrentTable.Provider>
         </div>
     );

@@ -1,16 +1,13 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {contextCurrentTable, contextSelectedRows, contextCurrentShift} from "../context";
-import classes from "./MainTable.module.css";
-import blueCircle from "../assets/blueCircle.png"
-import {getTableName} from "../dictionary";
+import {contextSelectedRows, contextCurrentShift} from "../../context";
+import classes from "./TableStopTrans.module.css";
+import blueCircle from "../../assets/blueCircle.png"
 import moment from "moment";
-import {useKeyPress} from "../hooks/useKeyPress";
-import store from "../store/Store";
+import {useKeyPress} from "../../hooks/useKeyPress";
+import store from "../../store/Store";
+import {STOP_TRANS_HEADERS} from "../../utils/consts";
 
-const stopTransHeaders = ["Start", "End", "Duration", "PLC Code", "Code", "C", "Description", "PLC Desc.", "Reason", "Place", "Main", "Harm"]
-
-const MainTable = () => {
-    const [currentTable, setCurrentTable] = useContext(contextCurrentTable)
+const TableStopTrans = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
     const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
 
@@ -53,12 +50,12 @@ const MainTable = () => {
                 setSelectedRows((r) => r.concat(index))
         } else {
             if (selectedRows.length > 1)
-                setSelectedRows((r) => [index])
+                setSelectedRows(() => [index])
             else
                 if (selectedRows.includes(index))
-                    setSelectedRows((r) => [])
+                    setSelectedRows(() => [])
                 else
-                    setSelectedRows((r) => [index])
+                    setSelectedRows(() => [index])
         }
     }
 
@@ -130,13 +127,13 @@ const MainTable = () => {
 
     return (
         <div className={classes.container}>
-            <h1 align={'center'}>{getTableName(currentTable)}</h1>
+            <h1 align={'center'}>Стопы</h1>
             {isLoaded &&
                 <div className={classes.table_responsive}>
                     <table className={classes.table}>
                         <thead>
                         <tr>
-                            {stopTransHeaders.map((v, index) => (
+                            {STOP_TRANS_HEADERS.map((v, index) => (
                                 <th key={index}>{v}</th>
                             ))}
                         </tr>
@@ -145,7 +142,7 @@ const MainTable = () => {
                     <div className={classes.table_responsive_body}>
                         <table className={classes.table}>
                             <tbody>
-                            {stopTrans.map((stopTran, index) => (
+                            {stopTrans.map((stopTran) => (
                                 <tr
                                     key={stopTran.stop_id}
                                     onClick={() => updateSelections(stopTran.stop_id)}
@@ -174,4 +171,4 @@ const MainTable = () => {
     );
 };
 
-export default MainTable;
+export default TableStopTrans;

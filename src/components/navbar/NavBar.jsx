@@ -1,16 +1,15 @@
-import React, {useContext, useState} from 'react';
+import React, {useContext} from 'react';
 import classes from "./NavBar.module.css";
 import Select from "react-select";
-import {Button, Container, Nav, Navbar, NavDropdown} from "react-bootstrap";
-import {contextCurrentTable} from "../context";
+import {Container, Nav, Navbar} from "react-bootstrap";
+import {contextCurrentTable} from "../../context";
+import {TABLE_NAMES} from "../../utils/consts";
 
 const NavBar = () => {
-    const [currentTable, setCurrentTable] = useContext(contextCurrentTable)
+    const {currentTable, setCurrentTable} = useContext(contextCurrentTable)
 
-    const testData = ["Стопы", "Ордер", "Простои", "Артикул"]
-
-    const options = testData.map((td, index) => (
-        {value: index + 1, label: td}
+    const options = TABLE_NAMES.map((item) => (
+        {value: item.id, label: item.name}
     ))
 
     const getValue = () => {

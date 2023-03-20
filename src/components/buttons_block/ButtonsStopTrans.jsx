@@ -1,16 +1,15 @@
 import React, {useContext, useState} from 'react';
-import classes from "./ButtonsBlock.module.css";
-import {Button} from "react-bootstrap";
-import {contextSelectedRows} from "../context";
-import ModalStopTrans from "./modals/ModalStopTrans";
+import classes from "./ButtonsStopTrans.module.css";
+import {contextSelectedRows} from "../../context";
+import ModalStopTrans from "../modals/ModalStopTrans";
 import {
     STOP_TRANS_ADD_FLAG,
     STOP_TRANS_DELETE_FLAG,
     STOP_TRANS_EDIT_FLAG,
     STOP_TRANS_SPLIT_FLAG
-} from "../utils/consts";
+} from "../../utils/consts";
 
-const ButtonsBlock = () => {
+const ButtonsStopTrans = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
 
     const [modalStopTransActive, setModalStopTransActive] = useState(false)
@@ -73,4 +72,4 @@ const ButtonsBlock = () => {
     );
 };
 
-export default ButtonsBlock;
+export default ButtonsStopTrans;

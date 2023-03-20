@@ -1,0 +1,12 @@
+.container {
+    padding: 0 15px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    /*position: absolute;*/
+    /*bottom: 0;*/
+}
+
+.button {
+    margin: 10px;
+}
