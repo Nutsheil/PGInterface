@@ -11,7 +11,7 @@
     display: flex;
     justify-content: space-around;
 }
-.block_datetime_item {
+.block_datetime {
     display: flex;
     justify-content: space-between;
     width: 220px;

@@ -40,6 +40,7 @@ const NavBar = () => {
                             onChange={onChange}
                             value={getValue()}
                             options={options}
+                            isSearchable={false}
                         />
                     </Nav>
                     <Nav>

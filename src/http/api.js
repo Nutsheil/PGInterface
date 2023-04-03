@@ -1,7 +1,7 @@
 import {$host} from "./index";
 
-export const getStopTrans = async (shift_id) => {
-    const {data} = await $host.get(`/api/v1/stop-trans-full/?shift_id=${shift_id}`)
+export const getStopTrans = async (shift_id, mach_no) => {
+    const {data} = await $host.get(`/api/v1/stop-trans-full/?shift_id=${shift_id}&mach_no=${mach_no}`)
     console.log("get StopTrans for shift_id: ", shift_id)
     console.log(data)
     return data
@@ -85,6 +85,18 @@ export const getShiftCodesByDate = async (mach_no, beg_time, end_time, count=50)
     console.log(data)
     return data
 }
+export const getShifts = async () => {
+    const {data} = await $host.get(`/api/v1/shift/`)
+    console.log("get all Shifts")
+    console.log(data)
+    return data
+}
+export const getShift = async (id) => {
+    const {data} = await $host.get(`/api/v1/shift/${id}/`)
+    console.log("get Shift id: ", id)
+    console.log(data)
+    return data
+}
 
 
 export const getStopMains = async () => {
@@ -138,6 +150,52 @@ export const getStopCodes = async () => {
 export const getStopCode = async (id) => {
     const {data} = await $host.get(`/api/v1/stop-code/${id}/`)
     console.log("get StopCode id: ", id)
+    console.log(data)
+    return data
+}
+
+
+export const getProdOrders = async () => {
+    const {data} = await $host.get(`/api/v1/prod-order/`)
+    console.log("get all prodOrders")
+    console.log(data)
+    return data
+}
+export const getProdOrder = async (id) => {
+    const {data} = await $host.get(`/api/v1/prod-order/${id}/`)
+    console.log("get prodOrder id: ", id)
+    console.log(data)
+    return data
+}
+export const updateProdOrder = async (id, prodOrder) => {
+    const {data} = await $host.patch(`/api/v1/prod-order2/${id}/`, prodOrder)
+    console.log("prodOrder by id " + id + " is updated")
+    console.log(data)
+    return data
+}
+export const createProdOrder = async (prodOrder) => {
+    const {data} = await $host.post(`/api/v1/prod-order2/`, prodOrder)
+    console.log("prodOrder created")
+    console.log(data)
+    return data
+}
+export const deleteProdOrder = async (id) => {
+    const {data} = await $host.delete(`/api/v1/prod-order/${id}/`)
+    console.log("delete prodOrder id: ", id)
+    console.log(data)
+    return data
+}
+
+
+export const getProdArticles = async () => {
+    const {data} = await $host.get(`/api/v1/article/`)
+    console.log("get all ProdArticles")
+    console.log(data)
+    return data
+}
+export const getProdArticle = async (id) => {
+    const {data} = await $host.get(`/api/v1/article/${id}/`)
+    console.log("get ProdArticle id: ", id)
     console.log(data)
     return data
 }

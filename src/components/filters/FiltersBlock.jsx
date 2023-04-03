@@ -11,8 +11,6 @@ const FiltersBlock = () => {
                 return <FiltersStopTrans/>;
             // case 2 :
             //     return <OrderButtonsBlock/>;
-            // case 3 :
-            //     return <ProductionShiftButtonsBlock/>;
             default:
                 return <FiltersStopTrans/>;
         }

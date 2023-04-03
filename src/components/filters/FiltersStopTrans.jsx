@@ -1,7 +1,7 @@
 import React, {useContext, useEffect, useState} from 'react';
 import classes from "./FiltersStopTrans.module.css";
 import Select from "react-select";
-import {getMachines, getShiftCodes} from "../../http/api";
+import {getMachines, getShift, getShiftCodes} from "../../http/api";
 import {contextCurrentShift, contextSelectedRows} from "../../context";
 import moment from "moment";
 import ModalSearchShift from "../modals/ModalSearchShift";
@@ -11,7 +11,8 @@ const FiltersStopTrans = () => {
     const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
     const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
 
-    const [currentMachine, setCurrentMachine] = useState(null)
+    const [selectedMachine, setSelectedMachine] = useState(null)
+    const [selectedShift, setSelectedShift] = useState(null)
 
     const [machines, setMachines] = useState([])
     const [shifts, setShifts] = useState([])
@@ -37,7 +38,7 @@ const FiltersStopTrans = () => {
         getMachines().then(response => {
             setMachines(response)
             if (response.length)
-                setCurrentMachine(response[0].mach_no)
+                setSelectedMachine(response[0].mach_no)
         }).catch(error => {
             console.log(error)
         })
@@ -46,25 +47,42 @@ const FiltersStopTrans = () => {
     useEffect(() => {
         setShifts(() => [])
         setCurrentShift(() => null)
+        setSelectedShift(() => null)
         setSelectedRows(() => [])
-        store.machine = currentMachine
-        if (currentMachine) {
-            store.filterStore(currentMachine)
+        store.machine = selectedMachine
+        if (selectedMachine) {
+            store.filterStore(selectedMachine)
 
-            getShiftCodes(currentMachine).then(response => {
+            getShiftCodes(selectedMachine).then(response => {
                 setShifts(() => response)
                 if (response.length) {
                     setCurrentShift(() => response[0].shift_id)
+                    setSelectedShift(() => response[0].shift_id)
                     makeShiftTime(response[0].shift_code)
                 }
             }).catch(error => {
                 console.log(error)
             })
         }
-    }, [currentMachine])
+    }, [selectedMachine])
 
     useEffect(() => {
-        //TODO: make this point
+        if (currentShift === null)
+            return
+
+        const shift = optionsShifts.find(o => o.value === currentShift)
+        if (shift) {
+            makeShiftTime(shift.label)
+        } else {
+            setSelectedShift(null)
+            console.log("SHIFT NOT FOUNDED")
+            getShift(currentShift).then(response => {
+                setShiftStartTime(moment(response.shift_beg_time).format("DD.MM.YY  H:mm"))
+                setShiftEndTime(moment(response.shift_end_time).format("DD.MM.YY  H:mm"))
+            }).catch(error => {
+                console.log(error)
+            })
+        }
     }, [currentShift])
 
     const optionsMachines = machines.map((machine) => (
@@ -75,17 +93,17 @@ const FiltersStopTrans = () => {
     ))
 
     const getValueMachine = () => {
-        return currentMachine ? optionsMachines.find(o => o.value === currentMachine) : 0
+        return selectedMachine ? optionsMachines.find(o => o.value === selectedMachine) : 0
     }
     const getValueShift = () => {
-        return currentShift ? optionsShifts.find(o => o.value === currentShift) : 0
+        return selectedShift ? optionsShifts.find(o => o.value === selectedShift) : 0
     }
 
     const onChangeMachine = (newValue) => {
-        if (newValue.value === currentMachine)
+        if (newValue.value === selectedMachine)
             return
 
-        setCurrentMachine(newValue.value)
+        setSelectedMachine(newValue.value)
     }
 
     const onChangeShift = (newValue) => {
@@ -93,8 +111,8 @@ const FiltersStopTrans = () => {
             return
 
         setSelectedRows([])
-        makeShiftTime(newValue.label)
         setCurrentShift(newValue.value)
+        setSelectedShift(newValue.value)
     }
 
     return (

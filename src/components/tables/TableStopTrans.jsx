@@ -20,7 +20,7 @@ const TableStopTrans = () => {
     useEffect(() => {
         if (currentShift) {
             setIsLoaded(() => false)
-            store.stopTrans.updateStopTrans(currentShift).then(() => {
+            store.stopTrans.updateStopTrans(currentShift, store.machine).then(() => {
                 setStopTrans(store.stopTrans.getStopTrans())
                 setIsLoaded(() => true)
             }).catch(error => {
@@ -32,7 +32,7 @@ const TableStopTrans = () => {
     useEffect(() => {
         if (store.stopTrans.needUpdate) {
             setIsLoaded(() => false)
-            store.stopTrans.updateStopTrans(currentShift).then(() => {
+            store.stopTrans.updateStopTrans(currentShift, store.machine).then(() => {
                 setStopTrans(store.stopTrans.getStopTrans())
                 store.stopTrans.needUpdate = false
                 setIsLoaded(() => true)
@@ -80,10 +80,14 @@ const TableStopTrans = () => {
         return moment.utc(end - start).format("HH:mm:ss")
     }
     const getStopPLCCode = (stopTran) => {
-        return stopTran.plc_stop_cd ? stopTran.plc_stop_cd.plc_stopcd_orig : null
+        if (stopTran.plc_stop_cd !== null && typeof stopTran.plc_stop_cd === 'object')
+            return stopTran.plc_stop_cd.plc_stopcd_orig
+        else
+            return stopTran.plc_stop_cd
+        // return stopTran.plc_stop_cd ? stopTran.plc_stop_cd.plc_stopcd_orig : null
     }
-    const getStopCode = (stopTrans) => {
-        return stopTrans.stop_cd ? stopTrans.stop_cd.stop_cd : null
+    const getStopCode = (stopTran) => {
+        return stopTran.stop_cd ? stopTran.stop_cd.stop_cd : null
     }
     const getStopCommentFlag = (stopTran) => {
         if (stopTran.comment)
@@ -97,7 +101,11 @@ const TableStopTrans = () => {
         return stopTran.stop_cd ? stopTran.stop_cd.description : null
     }
     const getStopPLCDesc = (stopTran) => {
-        return stopTran.plc_stop_cd ? stopTran.plc_stop_cd.plc_description : null
+        if (stopTran.plc_stop_cd !== null && typeof stopTran.plc_stop_cd === 'object')
+            return stopTran.plc_stop_cd.plc_description
+        else
+            return null
+        // return stopTran.plc_stop_cd ? stopTran.plc_stop_cd.plc_description : null
     }
     const getStopReason = (stopTran) => {
         if (stopTran.stop_cd)

@@ -17,6 +17,7 @@
     "moment-duration-format": "^2.3.2",
     "prop-types": "^15.8.1",
     "rc-datetime-picker": "^1.6.1",
+    "rc-input-number": "^7.4.2",
     "react": "^18.2.0",
     "react-99h-time-picker": "^4.5.3",
     "react-bootstrap": "^2.7.0",

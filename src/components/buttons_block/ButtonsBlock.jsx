@@ -12,10 +12,8 @@ const ButtonsBlock = () => {
                 return <ButtonsStopTrans/>;
             case 2 :
                 return <ButtonsProdOrders/>;
-            // case 3 :
-            //     return <ProductionShiftButtonsBlock/>;
-            default:
-                return <ButtonsStopTrans/>;
+            // default:
+            //     return <ButtonsStopTrans/>;
         }
     }
 

@@ -12,10 +12,8 @@ const Tables = () => {
                 return <TableStopTrans/>;
             case 2 :
                 return <TableProdOrders/>;
-            // case 3 :
-            //     return <ProductionShiftTable/>;
-            default:
-                return <TableStopTrans/>;
+            // default:
+            //     return <TableStopTrans/>;
         }
     }
 

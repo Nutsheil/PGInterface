@@ -16,8 +16,8 @@ class StopTransStore {
         return stopTrans.find(stopTran => stopTran.stop_id === id)
     }
 
-    updateStopTrans(shift_id) {
-        return getStopTrans(shift_id).then(response => {
+    updateStopTrans(shift_id, mach_no) {
+        return getStopTrans(shift_id, mach_no).then(response => {
             this.#setStopTrans(response)
         }).catch(error => {
             console.log(error)
