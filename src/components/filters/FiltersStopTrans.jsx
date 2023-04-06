@@ -8,7 +8,7 @@ import ModalSearchShift from "../modals/ModalSearchShift";
 import store from "../../store/Store";
 
 const FiltersStopTrans = () => {
-    const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
+    const {setSelectedRows} = useContext(contextSelectedRows)
     const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
 
     const [selectedMachine, setSelectedMachine] = useState(null)
@@ -110,9 +110,9 @@ const FiltersStopTrans = () => {
         if (newValue.value === currentShift)
             return
 
-        setSelectedRows([])
-        setCurrentShift(newValue.value)
-        setSelectedShift(newValue.value)
+        setSelectedRows(() => [])
+        setCurrentShift(() => newValue.value)
+        setSelectedShift(() => newValue.value)
     }
 
     return (

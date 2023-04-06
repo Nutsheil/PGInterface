@@ -2,11 +2,12 @@ import React, {useContext} from 'react';
 import classes from "./NavBar.module.css";
 import Select from "react-select";
 import {Container, Nav, Navbar} from "react-bootstrap";
-import {contextCurrentTable} from "../../context";
+import {contextCurrentTable, contextSelectedRows} from "../../context";
 import {TABLE_NAMES} from "../../utils/consts";
 
 const NavBar = () => {
     const {currentTable, setCurrentTable} = useContext(contextCurrentTable)
+    const {setSelectedRows} = useContext(contextSelectedRows)
 
     const options = TABLE_NAMES.map((item) => (
         {value: item.id, label: item.name}
@@ -24,7 +25,8 @@ const NavBar = () => {
         if (newValue.value === currentTable)
             return
 
-        setCurrentTable(newValue.value)
+        setCurrentTable(() => newValue.value)
+        setSelectedRows(() => [])
     }
 
 

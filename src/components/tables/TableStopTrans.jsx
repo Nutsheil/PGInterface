@@ -8,7 +8,7 @@ import store from "../../store/Store";
 import {STOP_TRANS_HEADERS} from "../../utils/consts";
 
 const TableStopTrans = () => {
-    const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
+    const {selectedRows, setSelectedRows} = useContext(contextSelectedRows)
     const [currentShift, setCurrentShift] = useContext(contextCurrentShift)
 
     const [stopTrans, setStopTrans] = useState([])

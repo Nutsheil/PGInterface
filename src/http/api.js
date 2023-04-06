@@ -155,9 +155,9 @@ export const getStopCode = async (id) => {
 }
 
 
-export const getProdOrders = async () => {
-    const {data} = await $host.get(`/api/v1/prod-order/`)
-    console.log("get all prodOrders")
+export const getProdOrders = async (mach_no, ord_status=null) => {
+    const {data} = await $host.get(`/api/v1/prod-order/?mach_no=${mach_no}` + (ord_status ? `&ord_status=${ord_status}` : ''))
+    console.log("get all prodOrders by machine: ", mach_no, " and status ", ord_status)
     console.log(data)
     return data
 }

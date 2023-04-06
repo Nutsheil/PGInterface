@@ -10,3 +10,9 @@
 .button {
     margin: 10px;
 }
+
+.button_selected {
+    /*border: 2px solid black;*/
+    background-color: dodgerblue;
+    color: white;
+}

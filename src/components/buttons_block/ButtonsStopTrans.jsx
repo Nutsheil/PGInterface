@@ -10,7 +10,7 @@ import {
 } from "../../utils/consts";
 
 const ButtonsStopTrans = () => {
-    const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
+    const {selectedRows} = useContext(contextSelectedRows)
 
     const [modalStopTransActive, setModalStopTransActive] = useState(false)
     const [currentFlag, setCurrentFlag] = useState(0)

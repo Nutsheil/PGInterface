@@ -24,7 +24,7 @@ import {DatePicker} from "@skbkontur/react-ui";
 import TimePicker from 'react-time-picker';
 
 const ModalStopTrans = ({active, setActive, flag}) => {
-    const [selectedRows, setSelectedRows] = useContext(contextSelectedRows)
+    const {selectedRows} = useContext(contextSelectedRows)
 
     const [stopTran, setStopTran] = useState(null)
 

@@ -83,8 +83,7 @@ const ModalProdOrders = ({active, setActive}) => {
         if (currentOrderStartDate === null || currentOrderStartDate === "" || currentOrderStartTime === null)
             return null
 
-        const fullString = currentOrderStartDate + " " + currentOrderStartTime
-        const date = moment(fullString, "DD.MM.YYYY HH:mm:ss")
+        const dateString = moment(currentOrderStartDate + " " + currentOrderStartTime, "DD.MM.YYYY HH:mm:ss")
 
         createProdOrder({
             ord_no: currentOrderNo,
@@ -92,7 +91,7 @@ const ModalProdOrders = ({active, setActive}) => {
             ord_type: currentType,
             plan_qty: currentPlanQty,
             plan_mach_no: store.machine,
-            plan_beg_time: date,
+            plan_beg_time: dateString.format("YYYY-MM-DDTHH:mm:ss"),
             ord_status: "WRK"
         }).then(response => {
             console.log(response)
@@ -167,7 +166,7 @@ const ModalProdOrders = ({active, setActive}) => {
                             value={currentPlanQty}
                             onInput={onInputPlanQty}
                         />
-                        <label className={classes.a_type}>trp</label>
+                        <label className={classes.label_type}>trp</label>
                     </td>
                 </tr>
                 </tbody>

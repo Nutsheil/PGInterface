@@ -13,7 +13,6 @@ function App() {
     const [currentTable, setCurrentTable] = useState(1)
     const [selectedRows, setSelectedRows] = useState([])
     const [currentShift, setCurrentShift] = useState(null)
-    // const [currentShift, setCurrentShift] = useState(1089)
 
     useEffect(() => {
         const promises = store.update()
@@ -28,7 +27,7 @@ function App() {
     return (
         <div className="App">
             <contextCurrentTable.Provider value={{currentTable, setCurrentTable}}>
-                <contextSelectedRows.Provider value={[selectedRows, setSelectedRows]}>
+                <contextSelectedRows.Provider value={{selectedRows, setSelectedRows}}>
                     <contextCurrentShift.Provider value={[currentShift, setCurrentShift]}>
                         <NavBar/>
                         <FiltersBlock/>
