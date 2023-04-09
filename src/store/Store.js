@@ -3,7 +3,7 @@ import StopPlacesStore from "./StopPlacesStore";
 import StopReasonsStore from "./StopReasonsStore";
 import StopCodesStore from "./StopCodesStore";
 import StopTransStore from "./StopTransStore";
-import stopCodesStore from "./StopCodesStore";
+import ProdOrdersStore from "./ProdOrdersStore";
 
 const updateStore = () => {
     const p1 = StopMainsStore.updateStopMains()
@@ -49,6 +49,7 @@ const store = {
     stopReasons: StopReasonsStore,
     stopCodes: StopCodesStore,
     stopTrans: StopTransStore,
+    prodOrders: ProdOrdersStore,
     machine: null,
     update: updateStore,
     filterStore: filterStoreByMachine

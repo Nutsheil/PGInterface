@@ -95,6 +95,7 @@ const ModalProdOrders = ({active, setActive}) => {
             ord_status: "WRK"
         }).then(response => {
             console.log(response)
+            store.prodOrders.needUpdate = true
             setActive(false)
         }).catch(error => {
             console.log(error)

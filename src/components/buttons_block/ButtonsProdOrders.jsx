@@ -3,45 +3,13 @@ import classes from "./ButtonsProdOrders.module.css";
 import ModalProdOrders from "../modals/ModalProdOrders";
 import classNames from "classnames";
 import {contextSelectedRows} from "../../context";
-import {getProdOrders, updateProdOrder} from "../../http/api";
-import moment from "moment";
-import store from "../../store/Store";
+import ModalProdOrders2 from "../modals/ModalProdOrders2";
 
 const ButtonsProdOrders = () => {
     const {selectedRows} = useContext(contextSelectedRows)
 
     const [modalProdOrdersActive, setModalProdOrdersActive] = useState(false)
-
-    const startOrder = () => {
-        if (selectedRows.length !== 1)
-            return
-
-        const date = moment().format("YYYY-MM-DDTHH:mm:ss")
-
-        getProdOrders(store.machine, "WRKP").then(response => {
-            if (response.length === 1) {
-                updateProdOrder(response[0].ord_no, {
-                    ord_status: "END",
-                    ord_end_time: date
-                }).then(response => {
-                    console.log(response)
-                }).catch(error => {
-                    console.log(error)
-                })
-            }
-            if (response.length > 1)
-                console.log("More then 1 order in status WRKP")
-        })
-
-        updateProdOrder(selectedRows[0], {
-            ord_status: "WRKP",
-            ord_beg_time: date
-        }).then(response => {
-            console.log(response)
-        }).catch(error => {
-            console.log(error)
-        })
-    }
+    const [modalProdOrders2Active, setModalProdOrders2Active] = useState(false)
 
     return (
         <div>
@@ -68,11 +36,18 @@ const ButtonsProdOrders = () => {
             </div>
 
             <div className={classes.container}>
-                <button onClick={() => setModalProdOrdersActive(true)} className={classes.button}>
+                <button
+                    onClick={() => setModalProdOrdersActive(true)}
+                    className={classes.button}
+                >
                     Create new order
                 </button>
 
-                <button onClick={startOrder} className={classes.button}>
+                <button
+                    onClick={() => setModalProdOrders2Active(true)}
+                    className={classes.button}
+                    disabled={selectedRows.length !== 1}
+                >
                     Start next order
                 </button>
             </div>
@@ -80,6 +55,10 @@ const ButtonsProdOrders = () => {
             <ModalProdOrders
                 active={modalProdOrdersActive}
                 setActive={setModalProdOrdersActive}
+            />
+            <ModalProdOrders2
+                active={modalProdOrders2Active}
+                setActive={setModalProdOrders2Active}
             />
         </div>
     );

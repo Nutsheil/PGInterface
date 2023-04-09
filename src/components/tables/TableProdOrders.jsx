@@ -26,6 +26,17 @@ const TableProdOrders = () => {
         })
     }, [store.machine, ])
 
+    useEffect(() => {
+        if (store.prodOrders.needUpdate) {
+            getProdOrders(store.machine).then(response => {
+                setProdOrders(response)
+            }).catch(error => {
+                console.log(error)
+            })
+            store.prodOrders.needUpdate = false
+        }
+    }, [store.prodOrders.needUpdate])
+
     const updateSelections = (index) => {
         if (isKeyControl) {
             if (selectedRows.includes(index))
@@ -101,6 +112,18 @@ const TableProdOrders = () => {
     const getWDS = (prodOrder) => {
         return null
     }
+    const getBegTime = (prodOrder) => {
+        if (prodOrder.ord_beg_time === null)
+            return null
+
+        return moment(prodOrder.ord_beg_time ).format("DD.MM.YY HH:mm")
+    }
+    const getEndTime = (prodOrder) => {
+        if (prodOrder.ord_end_time === null)
+            return null
+
+        return moment(prodOrder.ord_end_time ).format("DD.MM.YY HH:mm")
+    }
     const getCommentFlag = (prodOrder) => {
         // return <img
         //     src={blueCircle}
@@ -148,6 +171,8 @@ const TableProdOrders = () => {
                                     <td>{getRemQty(prodOrder)}</td>
                                     <td>{getDuration(prodOrder)}</td>
                                     <td>{getWDS(prodOrder)}</td>
+                                    <td>{getBegTime(prodOrder)}</td>
+                                    <td>{getEndTime(prodOrder)}</td>
                                     <td>{getCommentFlag(prodOrder)}</td>
                                     <td>{getType(prodOrder)}</td>
                                 </tr>
