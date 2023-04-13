@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
 import classes from "./FiltersStopTrans.module.css";
 import Select from "react-select";
-import {getMachines, getShift, getShiftCodes} from "../../http/api";
-import {contextCurrentShift, contextSelectedRows} from "../../context";
+import {getMachines, getShift, getShiftCodes} from "../../../http/api";
+import {contextCurrentShift, contextSelectedRows} from "../../../context";
 import moment from "moment";
-import ModalSearchShift from "../modals/ModalSearchShift";
-import store from "../../store/Store";
+import ModalSearchShift from "../../modals/ModalSearchShift";
+import store from "../../../store/Store";
 
 const FiltersStopTrans = () => {
     const {setSelectedRows} = useContext(contextSelectedRows)

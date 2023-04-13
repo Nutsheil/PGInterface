@@ -1,45 +1,32 @@
 import React, {useContext, useEffect, useState} from 'react';
 import classes from "./ModalProdOrders.module.css";
 import ModalWindow from "../modal/ModalWindow";
-import {contextSelectedRows} from "../../context";
-import {getProdOrder, getProdOrders, updateProdOrder} from "../../http/api";
+import {getProdOrders, updateProdOrder} from "../../http/api";
 import moment from "moment/moment";
 import store from "../../store/Store";
+import {PROD_ORDERS_END, PROD_ORDERS_WRK, PROD_ORDERS_WRKP} from "../modules/prod_orders/constProdOrders";
+import {contextCurrentMachine, contextSelectedProdOrder} from "../modules/prod_orders/contextProdOrders";
 
 const ModalProdOrders2 = ({active, setActive}) => {
-    const {selectedRows} = useContext(contextSelectedRows)
+    const {selectedProdOrder} = useContext(contextSelectedProdOrder)
+    const {currentMachine} = useContext(contextCurrentMachine)
 
-    const [prodOrderId, setProdOrderId] = useState(null)
-    const [prodOrderType, setProdOrderType] = useState(null)
-    const [prodOrderPlanStart, setProdOrderPlanStart] = useState(null)
-    const [prodOrderPlanQty, setProdOrderPlanQty] = useState(null)
-    const [prodOrderStatus, setProdOrderStatus] = useState(null)
-    const [prodOrderArticleId, setProdOrderArticleId] = useState(null)
-    const [prodOrderArticleDesc, setProdOrderArticleDesc] = useState(null)
+    const [isValid, setIsValid] = useState(false)
 
     useEffect(() => {
-        if (active) {
-            getProdOrder(selectedRows[0]).then(response => {
-                setProdOrderId(response.ord_no)
-                setProdOrderType(response.ord_type)
-                setProdOrderPlanStart(response.plan_beg_time)
-                setProdOrderPlanQty(response.plan_qty)
-                setProdOrderStatus(response.ord_status)
-                setProdOrderArticleId(response.art_no.art_no)
-                setProdOrderArticleDesc(response.art_no.description)
-            }).catch(error => {
-                console.log(error)
-            })
-        }
+        if (active && selectedProdOrder !== null && typeof selectedProdOrder === "object")
+            setIsValid(() => true)
+        else
+            setIsValid(() => false)
     }, [active])
 
     const startOrder = () => {
         const date = moment().format("YYYY-MM-DDTHH:mm:ss")
 
-        getProdOrders(store.machine, "WRKP").then(response => {
+        getProdOrders(currentMachine, PROD_ORDERS_WRKP).then(response => {
             if (response.length === 1) {
                 updateProdOrder(response[0].ord_no, {
-                    ord_status: "END",
+                    ord_status: PROD_ORDERS_END,
                     ord_end_time: date
                 }).then(response => {
                     console.log(response)
@@ -48,10 +35,10 @@ const ModalProdOrders2 = ({active, setActive}) => {
                 })
             }
             if (response.length > 1) {
-                console.log("More then 1 order in status WRKP. Disable all...")
+                console.log("More then 1 order is active. Disable all...")
                 response.map(prodOrder => {
                     updateProdOrder(prodOrder.ord_no, {
-                        ord_status: "END",
+                        ord_status: PROD_ORDERS_END,
                         ord_end_time: date
                     }).then(response => {
                         console.log(response)
@@ -62,8 +49,8 @@ const ModalProdOrders2 = ({active, setActive}) => {
             }
         })
 
-        updateProdOrder(selectedRows[0], {
-            ord_status: "WRKP",
+        updateProdOrder(selectedProdOrder.ord_no, {
+            ord_status: PROD_ORDERS_WRKP,
             ord_beg_time: date
         }).then(response => {
             console.log(response)
@@ -74,53 +61,91 @@ const ModalProdOrders2 = ({active, setActive}) => {
         })
     }
 
-    const renderHeader = () => {
-        switch (prodOrderStatus) {
-            case "WRK":
-                return <h4 align={"center"}>Запустить ордер</h4>
-            case "WRKP":
-                return <h2 align={"center"}>Ордер уже запущен</h2>
-            case "END":
-                return <h2 align={"center"}>Ордер завершен</h2>
-        }
+    const reopenOrder = () => {
+        updateProdOrder(selectedProdOrder.ord_no, {
+            ord_status: PROD_ORDERS_WRK,
+            ord_beg_time: null,
+            ord_end_time: null
+        }).then(response => {
+            console.log(response)
+            store.prodOrders.needUpdate = true
+            setActive(false)
+        }).catch(error => {
+            console.log(error)
+        })
+    }
+
+    const getHeader = () => {
+        if (selectedProdOrder.ord_status === PROD_ORDERS_WRK)
+            return <h4 align={"center"}>Запуск ордера</h4>
+        if (selectedProdOrder.ord_status === PROD_ORDERS_END)
+            return <h4 align={"center"}>Возобновление ордера</h4>
+    }
+
+    const getButton = () => {
+        if (selectedProdOrder.ord_status === PROD_ORDERS_WRK)
+            return <button onClick={startOrder}>Запустить</button>
+        if (selectedProdOrder.ord_status === PROD_ORDERS_END)
+            return <button onClick={reopenOrder}>Возобновить</button>
     }
 
     return (
         <ModalWindow active={active} setActive={setActive}>
-            {renderHeader()}
+            {isValid &&
+                <div>
+                    {getHeader()}
 
-            <table className={classes.table}>
-                <tbody>
-                <tr>
-                    <th>Номер ордера</th>
-                    <td>{prodOrderId}</td>
-                </tr>
-                <tr>
-                    <th>Плановое начало</th>
-                    <td>{prodOrderPlanStart}</td>
-                </tr>
-                <tr>
-                    <th>Артикул</th>
-                    <td>{prodOrderArticleId + " - " + prodOrderArticleDesc}</td>
-                </tr>
-                <tr>
-                    <th>Тип ордера</th>
-                    <td>{prodOrderType}</td>
-                </tr>
-                <tr>
-                    <th>Плановое количество</th>
-                    <td>{prodOrderPlanQty}
-                        <label className={classes.label_type}>trp</label>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+                    <table className={classes.table}>
+                        <tbody>
+                        <tr>
+                            <th>Номер ордера</th>
+                            <td>{selectedProdOrder.ord_no}</td>
+                        </tr>
+                        <tr>
+                            <th>Артикул</th>
+                            <td>{selectedProdOrder.art_no.art_no + " - " + selectedProdOrder.art_no.description}</td>
+                        </tr>
+                        <tr>
+                            <th>Плановое количество</th>
+                            <td>
+                                {selectedProdOrder.plan_qty}
+                                <label className={classes.label_type}>trp</label>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th>Плановое начало</th>
+                            <td>{moment(selectedProdOrder.plan_beg_time).format("DD.MM.YY HH:mm")}</td>
+                        </tr>
+                        {selectedProdOrder.ord_status === PROD_ORDERS_END &&
+                            <tr>
+                                <th>Фактическое начало</th>
+                                <td>{moment(selectedProdOrder.ord_beg_time).format("DD.MM.YY HH:mm")}</td>
+                            </tr>
+                        }
+                        {selectedProdOrder.ord_status === PROD_ORDERS_END &&
+                            <tr>
+                                <th>Завершен</th>
+                                <td>{moment(selectedProdOrder.ord_end_time).format("DD.MM.YY HH:mm")}</td>
+                            </tr>
+                        }
+                        {selectedProdOrder.ord_status === PROD_ORDERS_END &&
+                            <tr>
+                                <th>Произведено</th>
+                                <td>
+                                    {selectedProdOrder.approved_qty ? selectedProdOrder.approved_qty : 0}
+                                    <label className={classes.label_type}>trp</label>
+                                </td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
 
-            <div className={classes.buttons_block}>
-                <button onClick={() => setActive(false)}>Отмена</button>
-                <button disabled={prodOrderStatus !== "WRK"} onClick={startOrder}>Начать</button>
-            </div>
-
+                    <div className={classes.buttons_block}>
+                        <button onClick={() => setActive(false)}>Отмена</button>
+                        {getButton()}
+                    </div>
+                </div>
+            }
         </ModalWindow>
     );
 };

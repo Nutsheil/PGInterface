@@ -11,4 +11,3 @@ export const STOP_TRANS_SPLIT_FLAG = 2
 export const STOP_TRANS_ADD_FLAG = 3
 export const STOP_TRANS_DELETE_FLAG = 4
 
-export const PROD_ORDERS_HEADERS = ["", "Status", "Mach", "Order", "Article", "Art Desc", "%", "Planned", "Net", "RemQty", "hh:mm", "W-D-S", "start", "end", "C", "Type"]

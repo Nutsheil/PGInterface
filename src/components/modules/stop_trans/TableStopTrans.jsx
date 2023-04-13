@@ -1,11 +1,11 @@
 import React, {useContext, useEffect, useState} from 'react';
-import {contextSelectedRows, contextCurrentShift} from "../../context";
+import {contextSelectedRows, contextCurrentShift} from "../../../context";
 import classes from "./TableStopTrans.module.css";
-import blueCircle from "../../assets/blueCircle.png"
+import blueCircle from "../../../assets/blueCircle.png"
 import moment from "moment";
-import {useKeyPress} from "../../hooks/useKeyPress";
-import store from "../../store/Store";
-import {STOP_TRANS_HEADERS} from "../../utils/consts";
+import {useKeyPress} from "../../../hooks/useKeyPress";
+import store from "../../../store/Store";
+import {STOP_TRANS_HEADERS} from "../../../utils/consts";
 
 const TableStopTrans = () => {
     const {selectedRows, setSelectedRows} = useContext(contextSelectedRows)

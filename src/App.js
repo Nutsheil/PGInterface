@@ -3,10 +3,8 @@ import React, {useEffect, useState} from "react";
 import {contextCurrentTable, contextSelectedRows, contextCurrentShift} from "./context";
 import store from "./store/Store";
 import NavBar from "./components/navbar/NavBar";
-import CommentBlock from "./components/CommentBlock";
-import FiltersBlock from "./components/filters/FiltersBlock";
-import Tables from "./components/tables/Tables";
-import ButtonsBlock from "./components/buttons_block/ButtonsBlock";
+import StopTrans from "./components/modules/stop_trans/StopTrans";
+import ProdOrders from "./components/modules/prod_orders/ProdOrders";
 
 
 function App() {
@@ -24,16 +22,22 @@ function App() {
         })
     }, [])
 
+    const renderModule = () => {
+        switch (currentTable) {
+            case 1 :
+                return <StopTrans/>
+            case 2 :
+                return <ProdOrders/>
+        }
+    }
+
     return (
         <div className="App">
             <contextCurrentTable.Provider value={{currentTable, setCurrentTable}}>
                 <contextSelectedRows.Provider value={{selectedRows, setSelectedRows}}>
                     <contextCurrentShift.Provider value={[currentShift, setCurrentShift]}>
                         <NavBar/>
-                        <FiltersBlock/>
-                        <Tables/>
-                        <CommentBlock/>
-                        <ButtonsBlock/>
+                        {renderModule()}
                     </contextCurrentShift.Provider>
                 </contextSelectedRows.Provider>
 

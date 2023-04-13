@@ -1,0 +1,30 @@
+.container {
+    padding: 15px;
+    display: flex;
+}
+
+.block_machines {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+.block_machines label {
+    margin-right: 15px;
+}
+
+.block_status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 50px;
+}
+.block_status label {
+    margin-right: 15px;
+}
+
+.select_machine {
+    width: 180px;
+}
+.select_status {
+    width: 180px;
+}

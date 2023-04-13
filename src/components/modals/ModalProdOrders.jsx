@@ -7,6 +7,7 @@ import store from "../../store/Store";
 import moment from "moment";
 import {DatePicker} from "@skbkontur/react-ui";
 import TimePicker from "react-time-picker";
+import {PROD_ORDERS_WRK} from "../modules/prod_orders/constProdOrders";
 
 const ModalProdOrders = ({active, setActive}) => {
     const [articles, setArticles] = useState([])
@@ -72,7 +73,7 @@ const ModalProdOrders = ({active, setActive}) => {
         setCurrentOrderNo(temp)
     }
     const onInputPlanQty = (event) => {
-        const temp = (event.target.validity.valid) ? event.target.value : currentOrderNo
+        const temp = (event.target.validity.valid) ? event.target.value : currentPlanQty
         setCurrentPlanQty(temp)
     }
 
@@ -92,7 +93,7 @@ const ModalProdOrders = ({active, setActive}) => {
             plan_qty: currentPlanQty,
             plan_mach_no: store.machine,
             plan_beg_time: dateString.format("YYYY-MM-DDTHH:mm:ss"),
-            ord_status: "WRK"
+            ord_status: PROD_ORDERS_WRK
         }).then(response => {
             console.log(response)
             store.prodOrders.needUpdate = true

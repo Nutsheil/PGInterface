@@ -1,13 +1,13 @@
 import React, {useContext, useState} from 'react';
 import classes from "./ButtonsStopTrans.module.css";
-import {contextSelectedRows} from "../../context";
-import ModalStopTrans from "../modals/ModalStopTrans";
+import {contextSelectedRows} from "../../../context";
+import ModalStopTrans from "../../modals/ModalStopTrans";
 import {
     STOP_TRANS_ADD_FLAG,
     STOP_TRANS_DELETE_FLAG,
     STOP_TRANS_EDIT_FLAG,
     STOP_TRANS_SPLIT_FLAG
-} from "../../utils/consts";
+} from "../../../utils/consts";
 
 const ButtonsStopTrans = () => {
     const {selectedRows} = useContext(contextSelectedRows)
